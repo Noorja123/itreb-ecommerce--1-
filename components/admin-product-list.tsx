@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Pencil, Trash2 } from "lucide-react"
 
 interface Product {
   id: string
@@ -104,26 +105,26 @@ export default function AdminProductList({
                       </button>
                     </>
                   ) : (
-                    <>
-                      <p className="text-lg font-bold text-primary">₹{product.price}</p>
-                      <button
-                        onClick={() => handleEditPrice(product.id, product.price)}
-                        className="ml-2 text-blue-600 hover:text-blue-800 transition-colors"
-                        title="Edit price"
-                      >
-                        ✏️
-                      </button>
-                    </>
+                    <p className="text-lg font-bold text-primary">₹{product.price}</p>
                   )}
                 </div>
               </div>
-              <button
-                onClick={() => handleDelete(product.id)}
-                className="ml-4 text-red-600 hover:text-red-800 transition-colors text-2xl"
-                title="Delete product"
-              >
-                🗑️
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleEditPrice(product.id, product.price)}
+                  className="text-blue-600 hover:text-blue-800 transition-colors"
+                  title="Edit price"
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => handleDelete(product.id)}
+                  className="text-red-600 hover:text-red-800 transition-colors"
+                  title="Delete product"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
