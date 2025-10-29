@@ -1,8 +1,7 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState, type React } from "react"
+import ModalPortal from "./ModalPortal"
 
 interface Product {
   id: string
@@ -53,9 +52,9 @@ export default function ProductCard({ product }: { product: Product }) {
           fullName: formData.fullName,
           phoneNumber: formData.phoneNumber,
           address: formData.address,
-          quantity: quantity,
+          quantity,
           price: product.price,
-          totalPrice: totalPrice,
+          totalPrice,
         }),
       })
 
@@ -84,37 +83,49 @@ export default function ProductCard({ product }: { product: Product }) {
           className="product-image-hover w-full h-full object-cover"
         />
       </div>
+
       <div className="p-4">
         <h3 className="text-lg font-semibold text-foreground mb-2">{product.name}</h3>
         <p className="text-muted text-sm mb-4 line-clamp-2">{product.description}</p>
+
         <div className="flex justify-between items-center">
           <span className="text-2xl font-bold text-primary">₹{product.price}</span>
-          <button onClick={handleOrderClick} className="btn-secondary text-sm hover:shadow-lg transition-shadow">
+          <button
+            onClick={handleOrderClick}
+            className="btn-secondary text-sm hover:shadow-lg transition-shadow"
+          >
             Order Now
           </button>
         </div>
+      </div>
 
-        {showOrderForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      {/* --- Order Form Modal --- */}
+      {showOrderForm && (
+        <ModalPortal>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fadeIn">
             <div className="bg-white rounded-lg p-6 max-w-2xl w-full shadow-xl max-h-[90vh] overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Product Image Section */}
+                {/* Product Details */}
                 <div className="flex flex-col items-center justify-center">
                   <img
                     src={product.image_url || "/placeholder.svg?height=300&width=300&query=product"}
                     alt={product.name}
                     className="w-full h-64 object-cover rounded-lg border border-border"
                   />
-                  <h3 className="text-xl font-bold text-foreground mt-4 text-center">{product.name}</h3>
+                  <h3 className="text-xl font-bold text-foreground mt-4 text-center">
+                    {product.name}
+                  </h3>
                   <p className="text-2xl font-bold text-primary mt-2">₹{product.price}</p>
                 </div>
 
-                {/* Order Form Section */}
+                {/* Order Form */}
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-4">Order Details</h3>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">
+                        Full Name
+                      </label>
                       <input
                         type="text"
                         name="fullName"
@@ -125,8 +136,11 @@ export default function ProductCard({ product }: { product: Product }) {
                         placeholder="Your name"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Phone Number</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">
+                        Phone Number
+                      </label>
                       <input
                         type="tel"
                         name="phoneNumber"
@@ -137,6 +151,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         placeholder="Your phone number"
                       />
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-1">Address</label>
                       <textarea
@@ -160,7 +175,9 @@ export default function ProductCard({ product }: { product: Product }) {
                         >
                           −
                         </button>
-                        <span className="text-lg font-semibold text-foreground flex-1 text-center">{quantity}</span>
+                        <span className="text-lg font-semibold text-foreground flex-1 text-center">
+                          {quantity}
+                        </span>
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(1)}
@@ -181,12 +198,15 @@ export default function ProductCard({ product }: { product: Product }) {
                     {message && (
                       <div
                         className={`p-3 rounded-md text-sm ${
-                          message.includes("successfully") ? "bg-cyan-100 text-cyan-800" : "bg-red-100 text-red-800"
+                          message.includes("successfully")
+                            ? "bg-cyan-100 text-cyan-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
                         {message}
                       </div>
                     )}
+
                     <div className="flex gap-3">
                       <button
                         type="button"
@@ -208,8 +228,8 @@ export default function ProductCard({ product }: { product: Product }) {
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </ModalPortal>
+      )}
     </div>
   )
 }

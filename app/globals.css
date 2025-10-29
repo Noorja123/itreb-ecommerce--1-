@@ -178,4 +178,12 @@
   .product-image-hover {
     @apply transition-transform duration-300 ease-out group-hover:scale-110;
   }
+  @keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
 }
