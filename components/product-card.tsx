@@ -48,12 +48,12 @@ export default function ProductCard({ product }: { product: Product }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          productId: product.id,
           productName: product.name,
           fullName: formData.fullName,
           phoneNumber: formData.phoneNumber,
           address: formData.address,
           quantity,
-          price: product.price,
           totalPrice,
         }),
       })

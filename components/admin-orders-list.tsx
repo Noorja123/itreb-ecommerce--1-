@@ -22,6 +22,7 @@ export default function AdminOrdersList() {
   }, [])
 
   const fetchOrders = async () => {
+    setLoading(true)
     try {
       const response = await fetch("/api/orders")
       const data = await response.json()
@@ -58,16 +59,16 @@ export default function AdminOrdersList() {
           `"${order.productName}"`,
           `"${order.fullName}"`,
           `"${order.phoneNumber}"`,
-          `"${order.address}"`,
-          order.quantity || 1,
+          `"${order.address.replace(/"/g, '""')}"`,
+          order.quantity || 0,
           order.price || 0,
-          order.totalPrice || order.price || 0,
+          order.totalPrice || 0,
         ].join(","),
       ),
     ].join("\n")
 
     // Create blob and download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
     link.setAttribute("href", url)
@@ -83,8 +84,8 @@ export default function AdminOrdersList() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-foreground">Orders</h2>
         <div className="flex gap-3">
-          <button onClick={fetchOrders} className="btn-outline text-sm">
-            Refresh
+          <button onClick={fetchOrders} className="btn-outline text-sm" disabled={loading}>
+            {loading ? "Refreshing..." : "Refresh"}
           </button>
           <button onClick={exportToExcel} className="btn-primary text-sm">
             Export to Excel
@@ -119,9 +120,9 @@ export default function AdminOrdersList() {
                   <td className="py-3 px-4 text-foreground">{order.fullName}</td>
                   <td className="py-3 px-4 text-foreground">{order.phoneNumber}</td>
                   <td className="py-3 px-4 text-foreground">{order.address}</td>
-                  <td className="py-3 px-4 text-foreground">{order.quantity || 1}</td>
-                  <td className="py-3 px-4 text-foreground">₹{order.price || 0}</td>
-                  <td className="py-3 px-4 text-foreground font-semibold">₹{order.totalPrice || order.price || 0}</td>
+                  <td className="py-3 px-4 text-foreground">{order.quantity || "N/A"}</td>
+                  <td className="py-3 px-4 text-foreground">₹{order.price?.toFixed(2) || "0.00"}</td>
+                  <td className="py-3 px-4 text-foreground font-semibold">₹{order.totalPrice?.toFixed(2) || "0.00"}</td>
                 </tr>
               ))}
             </tbody>
