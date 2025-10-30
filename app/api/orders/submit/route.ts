@@ -1,29 +1,34 @@
 import { getAdminClient } from "@/lib/supabase/admin";
 
+interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const {
-      productName,
       fullName,
       phoneNumber,
       address,
-      localBoard,      // Added this
-      regionalBoard,   // Added this
-      quantity = 1,
-      totalPrice,
-      productId,
+      localBoard,
+      regionalBoard,
+      items,
     } = body;
 
-    // Log the received data for debugging
     console.log("[v0] INFO: Received order submission:", body);
 
     if (
-      !productName ||
       !fullName ||
       !phoneNumber ||
       !address ||
-      !productId
+      !localBoard ||
+      !regionalBoard ||
+      !items ||
+      items.length === 0
     ) {
       console.error("[v0] ERROR: Validation failed. Missing required fields.");
       return Response.json({ error: "Missing required fields" }, { status: 400 });
@@ -31,20 +36,19 @@ export async function POST(request: Request) {
 
     const adminClient = getAdminClient();
 
-    // Insert the complete order data into the 'orders' table
-    const { data, error } = await adminClient.from("orders").insert([
-      {
-        product_id: productId,
-        product_name: productName,
+    const ordersToInsert = items.map((item: CartItem) => ({
+        product_id: item.id,
+        product_name: item.name,
         customer_name: fullName,
         customer_phone: phoneNumber,
         customer_address: address,
+        local_board: localBoard,
         regional_board: regionalBoard,
-        local_board: localBoard,          
-        quantity: quantity,
-        total_price: totalPrice,
-      },
-    ]).select();
+        quantity: item.quantity,
+        total_price: item.price * item.quantity,
+    }));
+
+    const { data, error } = await adminClient.from("orders").insert(ordersToInsert).select();
 
     if (error) {
       console.error("[v0] ERROR: Supabase insert failed:", error);
