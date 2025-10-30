@@ -8,13 +8,15 @@ export async function POST(request: Request) {
       fullName,
       phoneNumber,
       address,
-      // localBoard and regionalBoard are intentionally ignored for this test
+      localBoard,      // Added this
+      regionalBoard,   // Added this
       quantity = 1,
       totalPrice,
       productId,
     } = body;
 
-    console.log("[v0] DIAGNOSTIC: Received data:", body);
+    // Log the received data for debugging
+    console.log("[v0] INFO: Received order submission:", body);
 
     if (
       !productName ||
@@ -23,14 +25,13 @@ export async function POST(request: Request) {
       !address ||
       !productId
     ) {
-      console.error("[v0] DIAGNOSTIC: Validation failed.");
+      console.error("[v0] ERROR: Validation failed. Missing required fields.");
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const adminClient = getAdminClient();
 
-    // --- TEMPORARY DIAGNOSTIC INSERT ---
-    // We are NOT inserting local_board or regional_board to test the connection.
+    // Insert the complete order data into the 'orders' table
     const { data, error } = await adminClient.from("orders").insert([
       {
         product_id: productId,
@@ -38,23 +39,23 @@ export async function POST(request: Request) {
         customer_name: fullName,
         customer_phone: phoneNumber,
         customer_address: address,
-        // local_board: localBoard, // Temporarily removed
-        // regional_board: regionalBoard, // Temporarily removed
+        local_board: localBoard,          // Added this
+        regional_board: regionalBoard,    // Added this
         quantity: quantity,
         total_price: totalPrice,
       },
     ]).select();
 
     if (error) {
-      console.error("[v0] DIAGNOSTIC: Supabase Insert Error:", error);
+      console.error("[v0] ERROR: Supabase insert failed:", error);
       return Response.json({ error: "Database insert failed.", details: error.message }, { status: 500 });
     }
 
-    console.log("[v0] DIAGNOSTIC: Insert was successful!", data);
-    return Response.json({ success: true, message: "Diagnostic test successful." });
+    console.log("[v0] SUCCESS: Order inserted successfully!", data);
+    return Response.json({ success: true, message: "Order submitted successfully." });
 
   } catch (error: any) {
-    console.error("[v0] DIAGNOSTIC: General Error:", error);
+    console.error("[v0] ERROR: A general server error occurred:", error);
     return Response.json({ error: "A server error occurred.", details: error.message || 'Unknown error' }, { status: 500 });
   }
 }
