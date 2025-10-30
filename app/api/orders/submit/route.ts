@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       address,
       localBoard,
       regionalBoard,
+      subLocalBoard, // Add this
       items,
     } = body;
 
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
         customer_address: address,
         local_board: localBoard,
         regional_board: regionalBoard,
+        sub_local_board: subLocalBoard, // Add this
         quantity: item.quantity,
         total_price: item.price * item.quantity,
     }));

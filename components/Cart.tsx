@@ -13,6 +13,12 @@ const boardOptions = {
     "SSA": ["AM", "CT-MAL", "JGH", "PBR"],
 };
 
+const subLocalBoardOptions: { [key: string]: string[] } = {
+    "SM": ['Darkhana', 'Kurla', 'Agahall', 'Byculla', 'Hasnabad', 'AKB', 'other...'],
+    "NM": ['Jogeshwari', 'Green Park', 'Green View', 'Dahisar', 'Virar', 'Vaishali Nagar', 'Delta', 'Palghar', 'Navyuwan', 'Maneckpur', 'other..']
+};
+
+
 export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
     const [formData, setFormData] = useState({
@@ -21,20 +27,36 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
         address: "",
         localBoard: "",
         regionalBoard: "",
+        subLocalBoard: "",
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [localBoardOptions, setLocalBoardOptions] = useState<string[]>([]);
+    const [subLocalBoardOptionsList, setSubLocalBoardOptionsList] = useState<string[]>([]);
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => {
             const newFormData = { ...prev, [name]: value };
+
             if (name === "regionalBoard") {
                 const newLocalBoardOptions = boardOptions[value as keyof typeof boardOptions] || [];
                 setLocalBoardOptions(newLocalBoardOptions);
                 newFormData.localBoard = "";
+                newFormData.subLocalBoard = "";
+                setSubLocalBoardOptionsList([]);
             }
+
+            if (name === "localBoard") {
+                if (newFormData.regionalBoard === "WIN" && (value === "SM" || value === "NM")) {
+                    setSubLocalBoardOptionsList(subLocalBoardOptions[value] || []);
+                } else {
+                    setSubLocalBoardOptionsList([]);
+                }
+                newFormData.subLocalBoard = "";
+            }
+
             return newFormData;
         });
     };
@@ -58,7 +80,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
 
             if (response.ok) {
                 setMessage("Order submitted successfully!");
-                setFormData({ fullName: "", phoneNumber: "", address: "", localBoard: "", regionalBoard: "" });
+                setFormData({ fullName: "", phoneNumber: "", address: "", localBoard: "", regionalBoard: "", subLocalBoard: "" });
                 clearCart();
                 setTimeout(() => onClose(), 2000);
             } else {
@@ -135,6 +157,27 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                         ))}
                                     </select>
                                 </div>
+
+                                {subLocalBoardOptionsList.length > 0 && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-foreground mb-1">
+                                            Jamatkhana
+                                        </label>
+                                        <select
+                                            name="subLocalBoard"
+                                            value={formData.subLocalBoard}
+                                            onChange={handleInputChange}
+                                            required
+                                            className="w-full px-3 py-2 border border-border rounded-md"
+                                        >
+                                            <option value="" disabled>Select Jamatkhana</option>
+                                            {subLocalBoardOptionsList.map(board => (
+                                                <option key={board} value={board}>{board}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                )}
+
 
                                 {message && <p className="text-green-500">{message}</p>}
 
