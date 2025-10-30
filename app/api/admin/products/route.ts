@@ -6,6 +6,7 @@ export async function POST(request: Request) {
     const name = formData.get("name") as string
     const price = formData.get("price") as string
     const description = formData.get("description") as string
+    const stock_quantity = formData.get("stock_quantity") as string
     const file = formData.get("file") as File | null
 
     let imageUrl = ""
@@ -46,6 +47,8 @@ export async function POST(request: Request) {
           price: Number.parseFloat(price),
           description,
           image_url: imageUrl || null,
+          stock_quantity: Number.parseInt(stock_quantity),
+          in_stock: Number.parseInt(stock_quantity) > 0,
         },
       ])
       .select()

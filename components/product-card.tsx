@@ -9,6 +9,7 @@ interface Product {
   price: number
   description: string
   image_url?: string
+  stock_quantity: number
   in_stock?: boolean
 }
 
@@ -19,7 +20,7 @@ export default function ProductCard({ product }: { product: Product }) {
     addToCart(product);
   };
 
-  const isInStock = product.in_stock !== false;
+  const isInStock = product.stock_quantity > 0;
 
   return (
     <div className="product-card-hover bg-white rounded-lg shadow-md overflow-hidden border border-border hover:shadow-xl flex flex-col">
@@ -34,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="p-4 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-semibold text-foreground flex-1 pr-2">{product.name}</h3>
-          <Badge variant={isInStock ? "secondary" : "destructive"}>
+          <Badge variant={isInStock ? "secondary" : "destructive"} className={isInStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
             {isInStock ? "In Stock" : "Out of Stock"}
           </Badge>
         </div>

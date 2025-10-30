@@ -20,10 +20,10 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   try {
     const body = await request.json()
-    const { price } = body
+    const { price, stock_quantity } = body
 
-    if (price === undefined || price === null) {
-      return Response.json({ message: "Price is required" }, { status: 400 })
+    if (price === undefined || price === null || stock_quantity === undefined || stock_quantity === null) {
+      return Response.json({ message: "Price and stock quantity are required" }, { status: 400 })
     }
 
     const { getAdminClient } = await import("@/lib/supabase/admin")
@@ -31,7 +31,11 @@ export async function PATCH(request: Request, { params }: { params: { id: string
 
     const { data, error } = await adminClient
       .from("products")
-      .update({ price: Number.parseFloat(price) })
+      .update({ 
+        price: Number.parseFloat(price),
+        stock_quantity: Number.parseInt(stock_quantity),
+        in_stock: Number.parseInt(stock_quantity) > 0,
+       })
       .eq("id", params.id)
       .select()
 

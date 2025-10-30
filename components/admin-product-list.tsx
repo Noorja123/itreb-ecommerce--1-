@@ -9,6 +9,7 @@ interface Product {
   price: number
   description: string
   image: string
+  stock_quantity: number
 }
 
 export default function AdminProductList({
@@ -24,6 +25,7 @@ export default function AdminProductList({
 }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editPrice, setEditPrice] = useState<string>("")
+  const [editStock, setEditStock] = useState<string>("")
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return
@@ -41,17 +43,21 @@ export default function AdminProductList({
     }
   }
 
-  const handleEditPrice = (id: string, currentPrice: number) => {
+  const handleEdit = (id: string, currentPrice: number, currentStock: number) => {
     setEditingId(id)
     setEditPrice(currentPrice.toString())
+    setEditStock(currentStock.toString())
   }
 
-  const handleSavePrice = async (id: string) => {
+  const handleSave = async (id: string) => {
     try {
       const response = await fetch(`/api/admin/products/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ price: Number.parseFloat(editPrice) }),
+        body: JSON.stringify({ 
+          price: Number.parseFloat(editPrice),
+          stock_quantity: Number.parseInt(editStock),
+         }),
       })
 
       if (response.ok) {
@@ -59,7 +65,7 @@ export default function AdminProductList({
         onProductUpdated()
       }
     } catch (error) {
-      console.error("Failed to update price:", error)
+      console.error("Failed to update product:", error)
     }
   }
 
@@ -91,8 +97,14 @@ export default function AdminProductList({
                         className="w-24 px-2 py-1 border border-border rounded text-foreground bg-white"
                         step="0.01"
                       />
+                      <input
+                        type="number"
+                        value={editStock}
+                        onChange={(e) => setEditStock(e.target.value)}
+                        className="w-24 px-2 py-1 border border-border rounded text-foreground bg-white"
+                      />
                       <button
-                        onClick={() => handleSavePrice(product.id)}
+                        onClick={() => handleSave(product.id)}
                         className="px-2 py-1 bg-black text-white rounded text-sm hover:bg-slate-800"
                       >
                         Save
@@ -105,15 +117,18 @@ export default function AdminProductList({
                       </button>
                     </>
                   ) : (
-                    <p className="text-lg font-bold text-primary">₹{product.price}</p>
+                    <>
+                      <p className="text-lg font-bold text-primary">₹{product.price}</p>
+                      <p className="text-sm text-muted-foreground">({product.stock_quantity} in stock)</p>
+                    </>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleEditPrice(product.id, product.price)}
+                  onClick={() => handleEdit(product.id, product.price, product.stock_quantity)}
                   className="text-blue-600 hover:text-blue-800 transition-colors"
-                  title="Edit price"
+                  title="Edit product"
                 >
                   <Pencil className="w-5 h-5" />
                 </button>

@@ -8,6 +8,7 @@ interface FormData {
   name: string
   price: string
   description: string
+  stock_quantity: string
 }
 
 export default function AdminProductForm({
@@ -19,6 +20,7 @@ export default function AdminProductForm({
     name: "",
     price: "",
     description: "",
+    stock_quantity: "",
   })
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string>("")
@@ -69,6 +71,7 @@ export default function AdminProductForm({
       formDataToSend.append("name", formData.name)
       formDataToSend.append("price", formData.price)
       formDataToSend.append("description", formData.description)
+      formDataToSend.append("stock_quantity", formData.stock_quantity)
       if (file) {
         formDataToSend.append("file", file)
       }
@@ -80,7 +83,7 @@ export default function AdminProductForm({
 
       if (response.ok) {
         setMessage("Product added successfully!")
-        setFormData({ name: "", price: "", description: "" })
+        setFormData({ name: "", price: "", description: "", stock_quantity: "" })
         setFile(null)
         setPreview("")
         if (fileInputRef.current) fileInputRef.current.value = ""
@@ -143,6 +146,18 @@ export default function AdminProductForm({
             name="description"
             type="text"
             value={formData.description}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-foreground mb-2">Quantity</label>
+          <input
+            type="number"
+            name="stock_quantity"
+            value={formData.stock_quantity}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
             required
