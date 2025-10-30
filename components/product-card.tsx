@@ -1,6 +1,6 @@
 "use client"
 
-import { useState} from "react"
+import { useState, useEffect } from "react"
 import ModalPortal from "./ModalPortal"
 import { Badge } from "./ui/badge"
 
@@ -11,6 +11,15 @@ interface Product {
   description: string
   image_url?: string
   in_stock?: boolean
+}
+
+const boardOptions = {
+  "SIN": ["SEC", "HYD", "BAN"],
+  "CNEI": ["NGP", "YTLRAI-KTL"],
+  "WIN": ["SM", "NM", "VPS", "GOA", "PUNE", "THANE"],
+  "NEG": ["SRT", "KTCH", "SDP", "ADI"],
+  "NSA": ["JMG", "BHV", "MAH", "SRN", "RAJ"],
+  "SSA": ["AM", "CT-MAL", "JGH", "PBR"],
 }
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -25,16 +34,29 @@ export default function ProductCard({ product }: { product: Product }) {
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
+  const [localBoardOptions, setLocalBoardOptions] = useState<string[]>([])
 
   const handleOrderClick = () => {
     setShowOrderForm(true)
     setQuantity(1)
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => {
+      const newFormData = { ...prev, [name]: value };
+
+      if (name === "regionalBoard") {
+        const newLocalBoardOptions = boardOptions[value as keyof typeof boardOptions] || [];
+        setLocalBoardOptions(newLocalBoardOptions);
+        // Reset local board when regional changes
+        newFormData.localBoard = "";
+      }
+
+      return newFormData;
+    });
+  };
 
   const handleQuantityChange = (delta: number) => {
     setQuantity((prev) => Math.max(1, prev + delta))
@@ -181,33 +203,41 @@ export default function ProductCard({ product }: { product: Product }) {
 
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-1">
-                        Local Board
-                      </label>
-                      <input
-                        type="text"
-                        name="localBoard"
-                        value={formData.localBoard}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-foreground"
-                        placeholder="Your Local Board"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
                         Regional Board
                       </label>
-                      <input
-                        type="text"
+                      <select
                         name="regionalBoard"
                         value={formData.regionalBoard}
                         onChange={handleInputChange}
                         required
                         className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-foreground"
-                        placeholder="Your Regional Board"
-                      />
+                      >
+                        <option value="" disabled>Select a Regional Board</option>
+                        {Object.keys(boardOptions).map(board => (
+                          <option key={board} value={board}>{board}</option>
+                        ))}
+                      </select>
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1">
+                        Local Board
+                      </label>
+                      <select
+                        name="localBoard"
+                        value={formData.localBoard}
+                        onChange={handleInputChange}
+                        required
+                        disabled={!formData.regionalBoard}
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-foreground disabled:bg-slate-50"
+                      >
+                        <option value="" disabled>Select a Local Board</option>
+                        {localBoardOptions.map(board => (
+                          <option key={board} value={board}>{board}</option>
+                        ))}
+                      </select>
+                    </div>
+
 
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-1">Quantity</label>

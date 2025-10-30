@@ -39,8 +39,8 @@ export async function POST(request: Request) {
         customer_name: fullName,
         customer_phone: phoneNumber,
         customer_address: address,
-        local_board: localBoard,          // Added this
-        regional_board: regionalBoard,    // Added this
+        regional_board: regionalBoard,
+        local_board: localBoard,          
         quantity: quantity,
         total_price: totalPrice,
       },

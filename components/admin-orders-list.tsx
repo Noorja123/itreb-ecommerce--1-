@@ -8,8 +8,8 @@ interface Order {
   fullName: string
   phoneNumber: string
   address: string
-  localBoard?: string
   regionalBoard?: string
+  localBoard?: string
   quantity?: number
   price?: number
   totalPrice?: number
@@ -48,8 +48,8 @@ export default function AdminOrdersList() {
       "Product Name",
       "Customer Name",
       "Phone Number",
-      "Local Board",
       "Regional Board",
+      "Local Board",  
       "Address",
       "Quantity",
       "Unit Price",
@@ -62,9 +62,9 @@ export default function AdminOrdersList() {
           `"${order.timestamp}"`,
           `"${order.productName}"`,
           `"${order.fullName}"`,
-          `"${order.phoneNumber}"`,
-          `"${order.localBoard || ''}"`,
+          `"${order.phoneNumber}"`,          
           `"${order.regionalBoard || ''}"`,
+          `"${order.localBoard || ''}"`,
           `"${order.address.replace(/"/g, '""')}"`,
           order.quantity || 0,
           order.price || 0,
@@ -111,9 +111,9 @@ export default function AdminOrdersList() {
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Timestamp</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Name</th>
-                <th className="text-left py-3 px-4 font-semibold text-foreground">Phone</th>
-                <th className="text-left py-3 px-4 font-semibold text-foreground">Local Board</th>
+                <th className="text-left py-3 px-4 font-semibold text-foreground">Phone</th> 
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Regional Board</th>
+                <th className="text-left py-3 px-4 font-semibold text-foreground">Local Board</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Address</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Quantity</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Unit Price</th>
@@ -126,9 +126,9 @@ export default function AdminOrdersList() {
                   <td className="py-3 px-4 text-foreground">{order.timestamp}</td>
                   <td className="py-3 px-4 text-foreground">{order.productName}</td>
                   <td className="py-3 px-4 text-foreground">{order.fullName}</td>
-                  <td className="py-3 px-4 text-foreground">{order.phoneNumber}</td>
-                  <td className="py-3 px-4 text-foreground">{order.localBoard}</td>
+                  <td className="py-3 px-4 text-foreground">{order.phoneNumber}</td>                  
                   <td className="py-3 px-4 text-foreground">{order.regionalBoard}</td>
+                  <td className="py-3 px-4 text-foreground">{order.localBoard}</td>
                   <td className="py-3 px-4 text-foreground">{order.address}</td>
                   <td className="py-3 px-4 text-foreground">{order.quantity || "N/A"}</td>
                   <td className="py-3 px-4 text-foreground">₹{order.price?.toFixed(2) || "0.00"}</td>
