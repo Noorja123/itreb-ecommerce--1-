@@ -20,6 +20,8 @@ export async function GET() {
         fullName: order.customer_name,
         phoneNumber: order.customer_phone,
         address: order.customer_address,
+        localBoard: order.local_board,
+        regionalBoard: order.regional_board,
         quantity: order.quantity,
         price: order.total_price && order.quantity ? order.total_price / order.quantity : 0,
         totalPrice: order.total_price,

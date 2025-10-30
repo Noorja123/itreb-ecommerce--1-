@@ -20,6 +20,8 @@ export default function ProductCard({ product }: { product: Product }) {
     fullName: "",
     phoneNumber: "",
     address: "",
+    localBoard: "",
+    regionalBoard: "",
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -55,6 +57,8 @@ export default function ProductCard({ product }: { product: Product }) {
           fullName: formData.fullName,
           phoneNumber: formData.phoneNumber,
           address: formData.address,
+          localBoard: formData.localBoard,
+          regionalBoard: formData.regionalBoard,
           quantity,
           totalPrice,
         }),
@@ -62,7 +66,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
       if (response.ok) {
         setMessage("Order submitted successfully!")
-        setFormData({ fullName: "", phoneNumber: "", address: "" })
+        setFormData({ fullName: "", phoneNumber: "", address: "", localBoard: "", regionalBoard: "" })
         setQuantity(1)
         setTimeout(() => setShowOrderForm(false), 2000)
       } else {
@@ -172,6 +176,36 @@ export default function ProductCard({ product }: { product: Product }) {
                         className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-foreground"
                         placeholder="Your delivery address"
                         rows={3}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1">
+                        Local Board
+                      </label>
+                      <input
+                        type="text"
+                        name="localBoard"
+                        value={formData.localBoard}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-foreground"
+                        placeholder="Your Local Board"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1">
+                        Regional Board
+                      </label>
+                      <input
+                        type="text"
+                        name="regionalBoard"
+                        value={formData.regionalBoard}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white text-foreground"
+                        placeholder="Your Regional Board"
                       />
                     </div>
 

@@ -11,7 +11,10 @@ CREATE TABLE IF NOT EXISTS products (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create orders table
+-- Drop the old orders table if it exists
+DROP TABLE IF EXISTS orders;
+
+-- Create the new, corrected orders table
 CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
@@ -19,6 +22,8 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_name VARCHAR(255) NOT NULL,
   customer_phone VARCHAR(20) NOT NULL,
   customer_address TEXT NOT NULL,
+  local_board VARCHAR(255),
+  regional_board VARCHAR(255),
   quantity INTEGER DEFAULT 1,
   total_price DECIMAL(10, 2),
   order_status VARCHAR(50) DEFAULT 'pending',

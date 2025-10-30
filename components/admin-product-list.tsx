@@ -80,7 +80,7 @@ export default function AdminProductList({
             >
               <div className="flex-1">
                 <h3 className="font-semibold text-foreground">{product.name}</h3>
-                <p className="text-sm text-muted">{product.description}</p>
+                <p className="">{product.description}</p>
                 <div className="flex items-center gap-2 mt-2">
                   {editingId === product.id ? (
                     <>

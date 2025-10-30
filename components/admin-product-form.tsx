@@ -139,12 +139,11 @@ export default function AdminProductForm({
 
         <div>
           <label className="block text-sm font-medium text-foreground mb-2">Product Code</label>
-          <textarea
+          <input
             name="description"
             value={formData.description}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
-            rows={3}
             required
           />
         </div>
