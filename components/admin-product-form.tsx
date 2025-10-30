@@ -141,6 +141,7 @@ export default function AdminProductForm({
           <label className="block text-sm font-medium text-foreground mb-2">Product Code</label>
           <input
             name="description"
+            type="text"
             value={formData.description}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
