@@ -138,7 +138,7 @@ export default function AdminProductForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">Description</label>
+          <label className="block text-sm font-medium text-foreground mb-2">Product Code</label>
           <textarea
             name="description"
             value={formData.description}
