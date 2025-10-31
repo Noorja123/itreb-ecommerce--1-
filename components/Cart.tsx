@@ -4,18 +4,43 @@ import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import ModalPortal from "./ModalPortal";
 
+// Data for Regional and Local Boards
 const boardOptions = {
     "Southern India": ["Secunderabad", "Hyderabad", "Bengaluru"],
-    "Central Northern Eastern India": ["Nagpur", "Yavatmal","Raipur - Kolkata"],
+    "Central Northern Eastern India": ["Nagpur", "Yavatmal", "Raipur - Kolkata"],
     "Western India": ["South Mumbai", "North Mumbai", "Vapi Sanjan", "Goa", "Pune", "Thane"],
     "Northern Eastern Gujarat": ["Surat", "Kutch", "Sidhpur", "Ahmedabad"],
     "Northern Saurashtra": ["Jamnagar", "Bhavnagar", "Mahuva", "Surendranagar - Botad", "Rajkot"],
     "Southern Saurashtra": ["Amreli - Una", "Chitravad - Malia Hatina", "Junagadh", "Porbundar"],
 };
 
+// data for Jamatkhanas (Sub Local Boards)
 const subLocalBoardOptions: { [key: string]: string[] } = {
-    "South Mumbai": ['Darkhana', 'Kurla', 'Agahall', 'Byculla', 'Hasnabad', 'AKB', 'other...'],
-    "North Mumbai": ['Jogeshwari', 'Green Park', 'Green View', 'Dahisar', 'Virar', 'Vaishali Nagar', 'Delta', 'Palghar', 'Navyuwan', 'Maneckpur', 'other..']
+    "Secunderabad": ["Gudiyatnoor","Jainoor","Adilabad Society","Echoda","Nirmal","Nizamabad","Karimnagar","Kinwat","Secunderabad","Kompally"],
+    "Hyderabad": ["Hyderabad","Mehdipatnam","Warangal","Nanded","Parbhani","Bodhan"],
+    "Bengaluru": ["Bengaluru","Chennai","Pallavaram"],
+    "Nagpur": ["Agra","Brahmapuri","Desaiganj","Dhanora","Katol","Nagbhir","New Delhi","Ujjain","Armori","Chandrapur","Gadhchiroli","Gondia","Indore","Kanpur","Nagpur","Wardha","Chindwara","Jabalpur","Lanji"],
+    "Yavatmal": ["Akola","Ralegaon","Dongerkharda","Ghatanji","Mohda","Pandharkawda","Pusad","Wani","Yavatmal"],
+    "Raipur - Kolkata": ["Bilaspur","Dongergadh","Durg","Raipur","Rajnandgaon","Angool","Kolkatta","Cuttack"],
+    "South Mumbai": ["Bellard Pier","Napeansea Road","Aga Hall","Aga Khan Baug","Andheri","Bandra Bazar","Bandra Society","Byculla","Colaba","Darkhana","Hasnabad","Karimabad (Sby)","Kurla","Mahim","Santacruz","Versova"],
+    "North Mumbai": ["Dahisar","Delta","Dhanu Road","Green Park","Green View (Mira Road)","Jogeshwari","Malad West","Manekpur","Mira Road","Palghar","Vaishalinagar","Virar"],
+    "Vapi Sanjan": ["Kasavaroti","Udhwa","Valsad","Khanvel","Nani Daman","Sanjan","Selvasa","Solsumba","Umergaon","Vapi"],
+    "Goa": ["Kolhapur","Mapusa","Belgaum","Madgaon","Panjim","Ponda","Vasco"],
+    "Pune": ["Karad","Ahmednagar","Narangibaug","Palace View","Pune Wadi","Shrirampur","Aurangabad","Fazilpura"],
+    "Thane": ["Nasik Road", "Panvel", "Vashi", "Dombivali", "Kalyan", "Kausa", "Mumbra", "Nasik City", "Pen", "Thane"],
+    "Surat": ["Bharuch","Bodeli","Nandurbar","Utiadara","Ankleshwar","Kosamba","Navsari","Rander","Kanskiwad","Karimabad (Surat)","Unn Society"],
+    "Kutch": ["Baladia","Mata Na Madh","Wandhia","Wanki","Anjar","Bharapar","Bhuj","Gandhidham","Kera",	"Madhapar","Mundra","Nagalpur","Rapar","Sinugra"],
+    "Sidhpur": ["Abadpura","Alipura","Deesa","Kunwara","Deodara","Dethali","Karan","Karimabad (Kunwara)","Ladjipura","Lodhpur","Manpura","Mehdipura","Meloj","Meta","Methan","Metrana","Punasan","Samoda","Sidhpur","Vanasan","Varsila","Vishnagar"],
+    "Ahmedabad": ["Gundi","Kalupur","Sanand","Tarapur","Karimabad (Ahd)","Anand","Anand Society","Dholka","Gandhinagar","Jantanagar","Kankaria","Khambhat","Gupti","Shahalam","Shahpur","Vadodara","Viramgam"],
+    "Jamnagar": ["Bhatia","Dhrol","Dodhia","Ishwaria","Jamnagar","Jivapar","Kanalush","Khoja Beraja","Khodiyar Colony",	"Lalpur","Sarmat","Setalush"],
+    "Bhavnagar": ["Budhel","Chogath","Bhavnagar","Bhavnagar Gupti","Sihor","Bhimdad","Barvala Ghelasa","Gadhada Swamina","Palitana"],
+    "Mahuva": ["Bagdana","Thadiya","Gunderna","Jesar","Mahuva","Rajula","Talaja","Timbi","Jafferabad"],
+    "Surendranagar - Botad": ["Ran ni Tikar","Golden Park","Chotila","Dhangadhra","Diamond Society","Halvad","Joravarnagar","Limbdi","Silver Park","Thangadh","Jerampara","Wadhwan City","Karimabad (Dhanduka)","Ranpur","Botad","Botad Karimnagar","Dhandhuka","Vinchiya"],
+    "Rajkot": ["Ami Varsha","Bhadla","Gauridhar","Jetpur Machhu","Kotada Sangani", "Sanosara Mota",	"Sardhar","Dawoodi Plot","Akashdeep","Anandnagar","Ghunada","Gondal City","Gondal Society","Kalavad","Lajai","Lodhika","Maliya Miyana","Morbi","Morbi Society","Nava Thorala","Raiya Road","Bhogani Sheri","Vakaner"],
+    "Amreli - Una": ["Amreli Society", "Lilya Mota", "Amreli","Babra","Bagasara","Damnagar","Dhari Navi Vasahat","Dedan","Diu","Ghogla","Khambha","Una"],
+    "Chitravad - Malia Hatina": ["Amrapur","Bhalchel","Chitravad","Gangecha","Haripur","Jinjuda","Kenedypur","Kodinar","Lathodra","Malia Hatina","Nani Khodiar","Sangodra","Shergad","Veraval","Virpur"],
+    "Junagadh": ["Jamka","Paneli Moti","Bilkha","Dhoraji","Jetpur Kanthi","Junagadh","Karimabad (Jnd)","Upleta","Chorvad","Fagri","Meswan","Paswaria","Agatrai","Badodar","Jonpur","Keshod Limda Chowk","Keshod Gandhinagar","Mangrol"],
+    "Porbundar": ["Madhavpur Ghed","Bhanwad	Bhod","Porbundar","Ranavav","Raval"],
 };
 
 
@@ -43,17 +68,16 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             if (name === "regionalBoard") {
                 const newLocalBoardOptions = boardOptions[value as keyof typeof boardOptions] || [];
                 setLocalBoardOptions(newLocalBoardOptions);
+                // Reset dependent dropdowns
                 newFormData.localBoard = "";
                 newFormData.subLocalBoard = "";
                 setSubLocalBoardOptionsList([]);
             }
 
             if (name === "localBoard") {
-                if (newFormData.regionalBoard === "Western India" && (value === "South Mumbai" || value === "North Mumbai")) {
-                    setSubLocalBoardOptionsList(subLocalBoardOptions[value] || []);
-                } else {
-                    setSubLocalBoardOptionsList([]);
-                }
+                const newSubLocalOptions = subLocalBoardOptions[value as keyof typeof subLocalBoardOptions] || [];
+                setSubLocalBoardOptionsList(newSubLocalOptions);
+                // Reset sub-local board selection
                 newFormData.subLocalBoard = "";
             }
 
@@ -142,7 +166,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                 <div>
                                     <label className="block text-sm font-medium text-foreground mb-1">Regional Board</label>
                                     <select name="regionalBoard" value={formData.regionalBoard} onChange={handleInputChange} required className="w-full px-3 py-2 border border-border rounded-md">
-                                        <option value="" disabled>Select a Regional Board</option>
+                                        <option value="" disabled>Select Regional Board</option>
                                         {Object.keys(boardOptions).map(board => (
                                             <option key={board} value={board}>{board}</option>
                                         ))}
@@ -151,7 +175,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                 <div>
                                     <label className="block text-sm font-medium text-foreground mb-1">Local Board</label>
                                     <select name="localBoard" value={formData.localBoard} onChange={handleInputChange} required disabled={!formData.regionalBoard} className="w-full px-3 py-2 border border-border rounded-md disabled:bg-slate-50">
-                                        <option value="" disabled>Select a Local Board</option>
+                                        <option value="" disabled>Select Local Board</option>
                                         {localBoardOptions.map(board => (
                                             <option key={board} value={board}>{board}</option>
                                         ))}
