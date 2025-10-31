@@ -2,6 +2,7 @@
 
 import { useCart } from "@/app/context/CartContext"
 import { Badge } from "./ui/badge"
+import { useToast } from "@/hooks/use-toast"
 
 interface Product {
   id: string
@@ -15,9 +16,14 @@ interface Product {
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const { toast } = useToast()
 
   const handleAddToCart = () => {
     addToCart(product);
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`,
+    })
   };
 
   const isInStock = product.stock_quantity > 0;

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -27,6 +28,7 @@ export default function AdminProductList({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState<string>("");
   const [editStock, setEditStock] = useState<string>("");
+  const { toast } = useToast()
 
   const handleEdit = (id: string, currentPrice: number, currentStock: number) => {
     setEditingId(id);
@@ -44,12 +46,25 @@ export default function AdminProductList({
 
       if (response.ok) {
         onProductDeleted();
+        toast({
+          title: "Product deleted",
+          description: "The product has been successfully deleted.",
+        })
       } else {
         const errorData = await response.json();
-        alert(`Failed to delete: ${errorData.message}`);
+        toast({
+          title: "Error deleting product",
+          description: errorData.message,
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error("An error occurred during delete:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      })
     }
   };
 
@@ -67,12 +82,25 @@ export default function AdminProductList({
       if (response.ok) {
         setEditingId(null);
         onProductUpdated();
+        toast({
+          title: "Product updated",
+          description: "The product has been successfully updated.",
+        })
       } else {
         const errorData = await response.json();
-        alert(`Failed to save: ${errorData.message}`);
+        toast({
+          title: "Error updating product",
+          description: errorData.message,
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error("An error occurred during save:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      })
     }
   };
 
