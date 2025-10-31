@@ -1,15 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import { Pencil, Trash2 } from "lucide-react"
+import { useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface Product {
-  id: string
-  name: string
-  price: number
-  description: string
-  image: string
-  stock_quantity: number
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image_url?: string;
+  stock_quantity: number;
+  is_deleted: boolean;
 }
 
 export default function AdminProductList({
@@ -18,56 +19,62 @@ export default function AdminProductList({
   onProductDeleted,
   onProductUpdated,
 }: {
-  products: Product[]
-  loading: boolean
-  onProductDeleted: () => void
-  onProductUpdated: () => void
+  products: Product[];
+  loading: boolean;
+  onProductDeleted: () => void;
+  onProductUpdated: () => void;
 }) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editPrice, setEditPrice] = useState<string>("")
-  const [editStock, setEditStock] = useState<string>("")
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editPrice, setEditPrice] = useState<string>("");
+  const [editStock, setEditStock] = useState<string>("");
+
+  const handleEdit = (id: string, currentPrice: number, currentStock: number) => {
+    setEditingId(id);
+    setEditPrice(currentPrice.toString());
+    setEditStock(currentStock.toString());
+  };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return
+    if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
       const response = await fetch(`/api/admin/products/${id}`, {
         method: "DELETE",
-      })
+      });
 
       if (response.ok) {
-        onProductDeleted()
+        onProductDeleted();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete: ${errorData.message}`);
       }
     } catch (error) {
-      console.error("Failed to delete product:", error)
+      console.error("An error occurred during delete:", error);
     }
-  }
-
-  const handleEdit = (id: string, currentPrice: number, currentStock: number) => {
-    setEditingId(id)
-    setEditPrice(currentPrice.toString())
-    setEditStock(currentStock.toString())
-  }
+  };
 
   const handleSave = async (id: string) => {
     try {
       const response = await fetch(`/api/admin/products/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           price: Number.parseFloat(editPrice),
           stock_quantity: Number.parseInt(editStock),
-         }),
-      })
+        }),
+      });
 
       if (response.ok) {
-        setEditingId(null)
-        onProductUpdated()
+        setEditingId(null);
+        onProductUpdated();
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to save: ${errorData.message}`);
       }
     } catch (error) {
-      console.error("Failed to update product:", error)
+      console.error("An error occurred during save:", error);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -145,5 +152,5 @@ export default function AdminProductList({
         </div>
       )}
     </div>
-  )
+  );
 }

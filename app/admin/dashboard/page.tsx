@@ -8,50 +8,56 @@ import AdminProductForm from "@/components/admin-product-form"
 import AdminProductList from "@/components/admin-product-list"
 import AdminOrdersList from "@/components/admin-orders-list"
 
+// Corrected Product interface
 interface Product {
-  id: string
-  name: string
-  price: number
-  description: string
-  image: string
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  image_url?: string;
+  stock_quantity: number;
+  is_deleted: boolean;
 }
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [products, setProducts] = useState<Product[]>([])
-  const [activeTab, setActiveTab] = useState<"products" | "orders">("products")
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [activeTab, setActiveTab] = useState<"products" | "orders">("products");
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken")
+    const token = localStorage.getItem("adminToken");
     if (!token) {
-      router.push("/admin")
-      return
+      router.push("/admin");
+      return;
     }
-    setIsAuthenticated(true)
-    fetchProducts()
-  }, [router])
+    setIsAuthenticated(true);
+    fetchProducts();
+  }, [router]);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/products")
-      const data = await response.json()
-      setProducts(data)
+      const response = await fetch("/api/products");
+      const data = await response.json();
+      // Filter out deleted products so they don't appear in the list
+      const activeProducts = data.filter((p: Product) => !p.is_deleted);
+      setProducts(activeProducts);
     } catch (error) {
-      console.error("Failed to fetch products:", error)
+      console.error("Failed to fetch products:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken")
-    router.push("/admin")
-  }
+    localStorage.removeItem("adminToken");
+    router.push("/admin");
+  };
 
   if (!isAuthenticated) {
-    return null
+    return null;
   }
 
   return (
@@ -106,5 +112,5 @@ export default function AdminDashboard() {
       </div>
       <Footer />
     </main>
-  )
+  );
 }
