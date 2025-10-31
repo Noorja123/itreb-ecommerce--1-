@@ -5,17 +5,17 @@ import { useCart } from "@/app/context/CartContext";
 import ModalPortal from "./ModalPortal";
 
 const boardOptions = {
-    "SIN": ["SEC", "HYD", "BAN"],
-    "CNEI": ["NGP", "YTLRAI-KTL"],
-    "WIN": ["SM", "NM", "VPS", "GOA", "PUNE", "THANE"],
-    "NEG": ["SRT", "KTCH", "SDP", "ADI"],
-    "NSA": ["JMG", "BHV", "MAH", "SRN", "RAJ"],
-    "SSA": ["AM", "CT-MAL", "JGH", "PBR"],
+    "Southern India": ["Secunderabad", "Hyderabad", "Bengaluru"],
+    "Central Northern Eastern India": ["Nagpur", "Yavatmal","Raipur - Kolkata"],
+    "Western India": ["South Mumbai", "North Mumbai", "Vapi Sanjan", "Goa", "Pune", "Thane"],
+    "Northern Eastern Gujarat": ["Surat", "Kutch", "Sidhpur", "Ahmedabad"],
+    "Northern Saurashtra": ["Jamnagar", "Bhavnagar", "Mahuva", "Surendranagar - Botad", "Rajkot"],
+    "Southern Saurashtra": ["Amreli - Una", "Chitravad - Malia Hatina", "Junagadh", "Porbundar"],
 };
 
 const subLocalBoardOptions: { [key: string]: string[] } = {
-    "SM": ['Darkhana', 'Kurla', 'Agahall', 'Byculla', 'Hasnabad', 'AKB', 'other...'],
-    "NM": ['Jogeshwari', 'Green Park', 'Green View', 'Dahisar', 'Virar', 'Vaishali Nagar', 'Delta', 'Palghar', 'Navyuwan', 'Maneckpur', 'other..']
+    "South Mumbai": ['Darkhana', 'Kurla', 'Agahall', 'Byculla', 'Hasnabad', 'AKB', 'other...'],
+    "North Mumbai": ['Jogeshwari', 'Green Park', 'Green View', 'Dahisar', 'Virar', 'Vaishali Nagar', 'Delta', 'Palghar', 'Navyuwan', 'Maneckpur', 'other..']
 };
 
 
@@ -49,7 +49,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             }
 
             if (name === "localBoard") {
-                if (newFormData.regionalBoard === "WIN" && (value === "SM" || value === "NM")) {
+                if (newFormData.regionalBoard === "Western India" && (value === "South Mumbai" || value === "North Mumbai")) {
                     setSubLocalBoardOptionsList(subLocalBoardOptions[value] || []);
                 } else {
                     setSubLocalBoardOptionsList([]);
