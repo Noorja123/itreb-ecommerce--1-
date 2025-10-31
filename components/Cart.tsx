@@ -29,18 +29,18 @@ const subLocalBoardOptions: { [key: string]: string[] } = {
     "Pune": ["Karad","Ahmednagar","Narangibaug","Palace View","Pune Wadi","Shrirampur","Aurangabad","Fazilpura"],
     "Thane": ["Nasik Road", "Panvel", "Vashi", "Dombivali", "Kalyan", "Kausa", "Mumbra", "Nasik City", "Pen", "Thane"],
     "Surat": ["Bharuch","Bodeli","Nandurbar","Utiadara","Ankleshwar","Kosamba","Navsari","Rander","Kanskiwad","Karimabad (Surat)","Unn Society"],
-    "Kutch": ["Baladia","Mata Na Madh","Wandhia","Wanki","Anjar","Bharapar","Bhuj","Gandhidham","Kera",	"Madhapar","Mundra","Nagalpur","Rapar","Sinugra"],
+    "Kutch": ["Baladia","Mata Na Madh","Wandhia","Wanki","Anjar","Bharapar","Bhuj","Gandhidham","Kera", "Madhapar","Mundra","Nagalpur","Rapar","Sinugra"],
     "Sidhpur": ["Abadpura","Alipura","Deesa","Kunwara","Deodara","Dethali","Karan","Karimabad (Kunwara)","Ladjipura","Lodhpur","Manpura","Mehdipura","Meloj","Meta","Methan","Metrana","Punasan","Samoda","Sidhpur","Vanasan","Varsila","Vishnagar"],
     "Ahmedabad": ["Gundi","Kalupur","Sanand","Tarapur","Karimabad (Ahd)","Anand","Anand Society","Dholka","Gandhinagar","Jantanagar","Kankaria","Khambhat","Gupti","Shahalam","Shahpur","Vadodara","Viramgam"],
-    "Jamnagar": ["Bhatia","Dhrol","Dodhia","Ishwaria","Jamnagar","Jivapar","Kanalush","Khoja Beraja","Khodiyar Colony",	"Lalpur","Sarmat","Setalush"],
+    "Jamnagar": ["Bhatia","Dhrol","Dodhia","Ishwaria","Jamnagar","Jivapar","Kanalush","Khoja Beraja","Khodiyar Colony", "Lalpur","Sarmat","Setalush"],
     "Bhavnagar": ["Budhel","Chogath","Bhavnagar","Bhavnagar Gupti","Sihor","Bhimdad","Barvala Ghelasa","Gadhada Swamina","Palitana"],
     "Mahuva": ["Bagdana","Thadiya","Gunderna","Jesar","Mahuva","Rajula","Talaja","Timbi","Jafferabad"],
     "Surendranagar - Botad": ["Ran ni Tikar","Golden Park","Chotila","Dhangadhra","Diamond Society","Halvad","Joravarnagar","Limbdi","Silver Park","Thangadh","Jerampara","Wadhwan City","Karimabad (Dhanduka)","Ranpur","Botad","Botad Karimnagar","Dhandhuka","Vinchiya"],
-    "Rajkot": ["Ami Varsha","Bhadla","Gauridhar","Jetpur Machhu","Kotada Sangani", "Sanosara Mota",	"Sardhar","Dawoodi Plot","Akashdeep","Anandnagar","Ghunada","Gondal City","Gondal Society","Kalavad","Lajai","Lodhika","Maliya Miyana","Morbi","Morbi Society","Nava Thorala","Raiya Road","Bhogani Sheri","Vakaner"],
+    "Rajkot": ["Ami Varsha","Bhadla","Gauridhar","Jetpur Machhu","Kotada Sangani", "Sanosara Mota", "Sardhar","Dawoodi Plot","Akashdeep","Anandnagar","Ghunada","Gondal City","Gondal Society","Kalavad","Lajai","Lodhika","Maliya Miyana","Morbi","Morbi Society","Nava Thorala","Raiya Road","Bhogani Sheri","Vakaner"],
     "Amreli - Una": ["Amreli Society", "Lilya Mota", "Amreli","Babra","Bagasara","Damnagar","Dhari Navi Vasahat","Dedan","Diu","Ghogla","Khambha","Una"],
     "Chitravad - Malia Hatina": ["Amrapur","Bhalchel","Chitravad","Gangecha","Haripur","Jinjuda","Kenedypur","Kodinar","Lathodra","Malia Hatina","Nani Khodiar","Sangodra","Shergad","Veraval","Virpur"],
     "Junagadh": ["Jamka","Paneli Moti","Bilkha","Dhoraji","Jetpur Kanthi","Junagadh","Karimabad (Jnd)","Upleta","Chorvad","Fagri","Meswan","Paswaria","Agatrai","Badodar","Jonpur","Keshod Limda Chowk","Keshod Gandhinagar","Mangrol"],
-    "Porbundar": ["Madhavpur Ghed","Bhanwad	Bhod","Porbundar","Ranavav","Raval"],
+    "Porbundar": ["Madhavpur Ghed","Bhanwad Bhod","Porbundar","Ranavav","Raval"],
 };
 
 
@@ -182,26 +182,26 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                     </select>
                                 </div>
 
-                                {subLocalBoardOptionsList.length > 0 && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-foreground mb-1">
-                                            Jamatkhana
-                                        </label>
-                                        <select
-                                            name="subLocalBoard"
-                                            value={formData.subLocalBoard}
-                                            onChange={handleInputChange}
-                                            required
-                                            className="w-full px-3 py-2 border border-border rounded-md"
-                                        >
-                                            <option value="" disabled>Select Jamatkhana</option>
-                                            {subLocalBoardOptionsList.map(board => (
-                                                <option key={board} value={board}>{board}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                )}
-
+                                {/* MODIFIED SECTION STARTS HERE */}
+                                <div>
+                                    <label className="block text-sm font-medium text-foreground mb-1">
+                                        Jamatkhana
+                                    </label>
+                                    <select
+                                        name="subLocalBoard"
+                                        value={formData.subLocalBoard}
+                                        onChange={handleInputChange}
+                                        required
+                                        disabled={!formData.localBoard} // Now disabled until a local board is selected
+                                        className="w-full px-3 py-2 border border-border rounded-md disabled:bg-slate-50" // Added disabled styling
+                                    >
+                                        <option value="" disabled>Select Jamatkhana</option>
+                                        {subLocalBoardOptionsList.map(board => (
+                                            <option key={board} value={board}>{board}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {/* MODIFIED SECTION ENDS HERE */}
 
                                 {message && <p className="text-green-500">{message}</p>}
 
