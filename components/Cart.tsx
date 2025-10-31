@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import ModalPortal from "./ModalPortal";
 
@@ -56,8 +56,16 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [orderPlaced, setOrderPlaced] = useState(false);
     const [localBoardOptions, setLocalBoardOptions] = useState<string[]>([]);
     const [subLocalBoardOptionsList, setSubLocalBoardOptionsList] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setMessage("");
+            setOrderPlaced(false);
+        }
+    }, [isOpen]);
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -104,6 +112,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
 
             if (response.ok) {
                 setMessage("Order submitted successfully!");
+                setOrderPlaced(true);
                 setFormData({ fullName: "", phoneNumber: "", address: "", localBoard: "", regionalBoard: "", subLocalBoard: "" });
                 clearCart();
                 setTimeout(() => onClose(), 2000);
@@ -125,7 +134,9 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
             <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 animate-fadeIn">
                 <div className="bg-white rounded-lg p-6 max-w-4xl w-full shadow-xl max-h-[90vh] overflow-y-auto">
                     <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
-                    {cart.length === 0 ? (
+                    {orderPlaced ? (
+                        <p>Order is placed successfully</p>
+                    ) : cart.length === 0 ? (
                         <p>Your cart is empty.</p>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
