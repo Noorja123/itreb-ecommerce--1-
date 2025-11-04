@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import ModalPortal from "./ModalPortal";
 
-// Data for Regional and Local Boards
+// ... (boardOptions and subLocalBoardOptions data remains the same) ...
 const boardOptions = {
     "Southern India": ["Secunderabad", "Hyderabad", "Bengaluru"],
     "Central Northern Eastern India": ["Nagpur", "Yavatmal", "Raipur - Kolkata"],
@@ -13,8 +13,6 @@ const boardOptions = {
     "Northern Saurashtra": ["Jamnagar", "Bhavnagar", "Mahuva", "Surendranagar - Botad", "Rajkot"],
     "Southern Saurashtra": ["Amreli - Una", "Chitravad - Malia Hatina", "Junagadh", "Porbundar"],
 };
-
-// data for Jamatkhanas (Sub Local Boards)
 const subLocalBoardOptions: { [key: string]: string[] } = {
     "Secunderabad": ["Gudiyatnoor","Jainoor","Adilabad Society","Echoda","Nirmal","Nizamabad","Karimnagar","Kinwat","Secunderabad","Kompally"],
     "Hyderabad": ["Hyderabad","Mehdipatnam","Warangal","Nanded","Parbhani","Bodhan"],
@@ -67,6 +65,21 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
         }
     }, [isOpen]);
 
+    // --- NEW LOGIC TO CLOSE MODAL WHEN EMPTY ---
+    useEffect(() => {
+        // If modal is open, cart is empty, and order hasn't just been placed
+        if (isOpen && cart.length === 0 && !orderPlaced) {
+            // Set a timer to close the modal after 1.5 seconds
+            const timer = setTimeout(() => {
+                onClose();
+            }, 1500); 
+
+            // Cleanup the timer if dependencies change or component unmounts
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen, cart, orderPlaced, onClose]); // Re-run when these change
+    // --- END OF NEW LOGIC ---
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -115,7 +128,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                 setOrderPlaced(true);
                 setFormData({ fullName: "", phoneNumber: "", address: "", localBoard: "", regionalBoard: "", subLocalBoard: "" });
                 clearCart();
-                setTimeout(() => onClose(), 2000);
+                setTimeout(() => onClose(), 2000); // Close after success
             } else {
                 setMessage("Failed to submit order. Please try again.");
             }
@@ -148,14 +161,10 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                             <h3 className="font-semibold">{item.name}</h3>
                                             <p className="text-sm text-muted-foreground">₹{item.price.toFixed(2)}</p>
                                         </div>
-                                        
-                                        {/* MODIFIED SECTION: Remove +/- buttons, show quantity */}
                                         <div className="text-right w-20">
                                             <span className="text-sm text-muted-foreground">Qty: </span>
                                             <span className="font-semibold">{item.quantity}</span>
                                         </div>
-                                        {/* END OF MODIFIED SECTION */}
-
                                         <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-700">Remove</button>
                                     </div>
                                 ))}
@@ -164,7 +173,6 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                 </div>
                             </div>
 
-                            {/* ... (the form remains exactly the same) ... */}
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
@@ -206,8 +214,8 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                         value={formData.subLocalBoard}
                                         onChange={handleInputChange}
                                         required
-                                        disabled={!formData.localBoard} 
-                                        className="w-full px-3 py-2 border border-border rounded-md disabled:bg-slate-50" 
+                                        disabled={!formData.localBoard} // Now disabled until a local board is selected
+                                        className="w-full px-3 py-2 border border-border rounded-md disabled:bg-slate-50" // Added disabled styling
                                     >
                                         <option value="" disabled>Select Jamatkhana</option>
                                         {subLocalBoardOptionsList.map(board => (
