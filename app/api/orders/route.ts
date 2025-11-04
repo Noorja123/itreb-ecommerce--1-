@@ -15,6 +15,8 @@ export async function GET() {
 
     return Response.json(
       (orders || []).map((order: any) => ({
+        id: order.id, // <-- ADD THIS
+        order_status: order.order_status, // <-- ADD THIS
         timestamp: new Date(order.created_at).toLocaleString(),
         productName: order.product_name,
         fullName: order.customer_name,
@@ -22,7 +24,7 @@ export async function GET() {
         address: order.customer_address,
         localBoard: order.local_board,
         regionalBoard: order.regional_board,
-        subLocalBoard: order.sub_local_board, // Add this line
+        subLocalBoard: order.sub_local_board,
         quantity: order.quantity,
         price: order.total_price && order.quantity ? order.total_price / order.quantity : 0,
         totalPrice: order.total_price,

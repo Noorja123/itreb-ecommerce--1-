@@ -1,8 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Switch } from "@/components/ui/switch" // <-- 1. Import Switch
+import { useToast } from "@/hooks/use-toast" // <-- 2. Import useToast
 
 interface Order {
+  id: string; // <-- 3. Add id
+  order_status: string; // <-- 4. Add order_status
   timestamp: string
   productName: string
   fullName: string
@@ -10,7 +14,7 @@ interface Order {
   address: string
   localBoard?: string
   regionalBoard?: string
-  subLocalBoard?: string; // Add this
+  subLocalBoard?: string;
   quantity?: number
   price?: number
   totalPrice?: number
@@ -19,6 +23,7 @@ interface Order {
 export default function AdminOrdersList() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast() // <-- 5. Initialize toast
 
   useEffect(() => {
     fetchOrders()
@@ -37,6 +42,60 @@ export default function AdminOrdersList() {
     }
   }
 
+  // 6. Add handler for status change
+  const handleStatusChange = async (orderId: string, newStatus: boolean) => {
+    const newDbStatus = newStatus ? "processed" : "pending";
+    const oldDbStatus = newStatus ? "pending" : "processed";
+
+    // Optimistically update UI
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId ? { ...order, order_status: newDbStatus } : order
+      )
+    );
+
+    try {
+      const response = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newDbStatus }),
+      });
+
+      // --- NEW: Try to parse the error message ---
+      if (!response.ok) {
+        let errorData = { message: "Failed to update status" };
+        try {
+          // Try to get the specific JSON error from our API
+          errorData = await response.json();
+        } catch (e) {
+          // Ignore if the response wasn't JSON
+        }
+        // Throw an error with the specific message
+        throw new Error(errorData.message);
+      }
+
+      toast({
+        title: "Order Updated",
+        description: `Order status set to ${newDbStatus}.`,
+      });
+    } catch (err) {
+      console.error("Failed to update order status:", err);
+      // Revert UI on failure
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, order_status: oldDbStatus } : order
+        )
+      );
+      toast({
+        title: "Error",
+        // --- NEW: Show the specific error message ---
+        description: err.message || "Could not update order status.",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   const exportToExcel = () => {
     if (orders.length === 0) {
       alert("No orders to export")
@@ -46,12 +105,13 @@ export default function AdminOrdersList() {
     // Create CSV content
     const headers = [
       "Timestamp",
+      "Order Status", // <-- 7. Add Status to export
       "Product Name",
       "Customer Name",
       "Phone Number",
       "Local Board",
       "Regional Board",
-      "Sub Local Board", // Add this
+      "Sub Local Board", 
       "Address",
       "Quantity",
       "Unit Price",
@@ -62,12 +122,13 @@ export default function AdminOrdersList() {
       ...orders.map((order) =>
         [
           `"${order.timestamp}"`,
+          `"${order.order_status}"`, // <-- 8. Add Status value to export
           `"${order.productName}"`,
           `"${order.fullName}"`,
           `"${order.phoneNumber}"`,
           `"${order.localBoard || ''}"`,
           `"${order.regionalBoard || ''}"`,
-          `"${order.subLocalBoard || ''}"`, // Add this
+          `"${order.subLocalBoard || ''}"`,
           `"${order.address.replace(/"/g, '""')}"`,
           order.quantity || 0,
           order.price || 0,
@@ -111,6 +172,8 @@ export default function AdminOrdersList() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
+                {/* 9. Add new table header */}
+                <th className="text-left py-3 px-4 font-semibold text-foreground">Processed</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Timestamp</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Name</th>
@@ -127,6 +190,15 @@ export default function AdminOrdersList() {
             <tbody>
               {orders.map((order, index) => (
                 <tr key={index} className="border-b border-border hover:bg-slate-50">
+                  {/* 10. Add new table cell with Switch */}
+                  <td className="py-3 px-4 text-foreground">
+                    <Switch
+                      id={`status-${order.id}`}
+                      checked={order.order_status === 'processed'}
+                      onCheckedChange={(newStatus) => handleStatusChange(order.id, newStatus)}
+                      aria-label={`Mark order from ${order.fullName} as processed`}
+                    />
+                  </td>
                   <td className="py-3 px-4 text-foreground">{order.timestamp}</td>
                   <td className="py-3 px-4 text-foreground">{order.productName}</td>
                   <td className="py-3 px-4 text-foreground">{order.fullName}</td>

@@ -3,11 +3,14 @@
 import { getAdminClient } from "@/lib/supabase/admin";
 import { NextRequest } from "next/server";
 
-// Helper function to extract ID from the URL
+// Helper function to extract ID from the URL, now handling query parameters
 function getProductIdFromUrl(url: string): string | undefined {
     try {
-        const parts = url.split('/');
-        // The ID will be the last part of the URL path
+        // Create a URL object to easily access the pathname
+        const { pathname } = new URL(url);
+        // Split the pathname by '/'
+        const parts = pathname.split('/');
+        // The ID will be the last part of the pathname, avoiding query strings
         return parts[parts.length - 1];
     } catch (error) {
         console.error("Could not parse product ID from URL:", url, error);
