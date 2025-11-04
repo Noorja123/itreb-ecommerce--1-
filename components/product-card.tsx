@@ -1,10 +1,9 @@
 "use client"
 
-import { useState } from "react" // <-- Import useState
+import { useState } from "react"
 import { useCart } from "@/app/context/CartContext"
 import { Badge } from "./ui/badge"
 import { useToast } from "@/hooks/use-toast"
-// Import Select components
 import {
   Select,
   SelectContent,
@@ -24,15 +23,14 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-  const { addToCart, cart } = useCart(); // <-- Get cart state as well
+  const { addToCart, cart } = useCart();
   const { toast } = useToast()
-  const [selectedQuantity, setSelectedQuantity] = useState(1); // <-- Add state for quantity
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   const handleAddToCart = () => {
     const existingCartItem = cart.find((item) => item.id === product.id);
     const currentQuantityInCart = existingCartItem ? existingCartItem.quantity : 0;
 
-    // Check if adding the selected quantity exceeds stock
     if (currentQuantityInCart + selectedQuantity > product.stock_quantity) {
       toast({
         title: "Stock limit reached",
@@ -42,7 +40,7 @@ export default function ProductCard({ product }: { product: Product }) {
       return;
     }
 
-    addToCart(product, selectedQuantity); // <-- Pass the selected quantity
+    addToCart(product, selectedQuantity);
     toast({
       title: "Added to cart",
       description: `${selectedQuantity} x ${product.name} has been added to your cart.`,
@@ -51,10 +49,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const isInStock = product.stock_quantity > 0;
   
-  // Create quantity options for the dropdown
-  // We'll show a max of 10 in the dropdown, or less if stock is lower
-  const maxDropdownQty = Math.min(product.stock_quantity, 10);
-  const quantityOptions = Array.from({ length: maxDropdownQty }, (_, i) => i + 1);
+  // MODIFIED SECTION: Create options for all available stock
+  const quantityOptions = Array.from({ length: product.stock_quantity }, (_, i) => i + 1);
 
   return (
     <div className="product-card-hover bg-white rounded-lg shadow-md overflow-hidden border border-border hover:shadow-xl flex flex-col">
@@ -78,7 +74,6 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="flex justify-between items-center mt-auto">
           <span className="text-2xl font-bold text-primary">₹{product.price}</span>
           
-          {/* MODIFIED SECTION: Add quantity select and update button */}
           <div className="flex items-center gap-2">
             <Select
               value={String(selectedQuantity)}
@@ -88,7 +83,8 @@ export default function ProductCard({ product }: { product: Product }) {
               <SelectTrigger className="w-[70px] h-9">
                 <SelectValue placeholder="Qty" />
               </SelectTrigger>
-              <SelectContent>
+              {/* MODIFIED SECTION: Added max-h- and overflow-y-auto for scrollbar */}
+              <SelectContent className="max-h-[200px] overflow-y-auto">
                 {quantityOptions.map(qty => (
                   <SelectItem key={qty} value={String(qty)}>{qty}</SelectItem>
                 ))}
@@ -102,8 +98,6 @@ export default function ProductCard({ product }: { product: Product }) {
               {isInStock ? "Add" : "Out of Stock"}
             </button>
           </div>
-          {/* END OF MODIFIED SECTION */}
-
         </div>
       </div>
     </div>
