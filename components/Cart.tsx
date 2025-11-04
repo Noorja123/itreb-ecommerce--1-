@@ -148,11 +148,14 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                             <h3 className="font-semibold">{item.name}</h3>
                                             <p className="text-sm text-muted-foreground">₹{item.price.toFixed(2)}</p>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="px-2 py-1 bg-slate-200 rounded">-</button>
-                                            <span>{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="px-2 py-1 bg-slate-200 rounded">+</button>
+                                        
+                                        {/* MODIFIED SECTION: Remove +/- buttons, show quantity */}
+                                        <div className="text-right w-20">
+                                            <span className="text-sm text-muted-foreground">Qty: </span>
+                                            <span className="font-semibold">{item.quantity}</span>
                                         </div>
+                                        {/* END OF MODIFIED SECTION */}
+
                                         <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-700">Remove</button>
                                     </div>
                                 ))}
@@ -161,6 +164,7 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                 </div>
                             </div>
 
+                            {/* ... (the form remains exactly the same) ... */}
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
@@ -193,7 +197,6 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                     </select>
                                 </div>
 
-                                {/* MODIFIED SECTION STARTS HERE */}
                                 <div>
                                     <label className="block text-sm font-medium text-foreground mb-1">
                                         Jamatkhana
@@ -203,8 +206,8 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                         value={formData.subLocalBoard}
                                         onChange={handleInputChange}
                                         required
-                                        disabled={!formData.localBoard} // Now disabled until a local board is selected
-                                        className="w-full px-3 py-2 border border-border rounded-md disabled:bg-slate-50" // Added disabled styling
+                                        disabled={!formData.localBoard} 
+                                        className="w-full px-3 py-2 border border-border rounded-md disabled:bg-slate-50" 
                                     >
                                         <option value="" disabled>Select Jamatkhana</option>
                                         {subLocalBoardOptionsList.map(board => (
@@ -212,7 +215,6 @@ export default function Cart({ isOpen, onClose }: { isOpen: boolean; onClose: ()
                                         ))}
                                     </select>
                                 </div>
-                                {/* MODIFIED SECTION ENDS HERE */}
 
                                 {message && <p className="text-green-500">{message}</p>}
 
