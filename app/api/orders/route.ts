@@ -5,7 +5,7 @@ export async function GET() {
     const adminClient = getAdminClient()
     const { data: orders, error } = await adminClient
       .from("orders")
-      .select("*")
+      .select("*, products(description)") // <-- Fetch related product description
       .order("created_at", { ascending: false })
 
     if (error) {
@@ -15,10 +15,11 @@ export async function GET() {
 
     return Response.json(
       (orders || []).map((order: any) => ({
-        id: order.id, // <-- ADD THIS
-        order_status: order.order_status, // <-- ADD THIS
+        id: order.id,
+        order_status: order.order_status,
         timestamp: new Date(order.created_at).toLocaleString(),
         productName: order.product_name,
+        productCode: order.products ? order.products.description : 'N/A', // <-- Add product code to response
         fullName: order.customer_name,
         phoneNumber: order.customer_phone,
         address: order.customer_address,

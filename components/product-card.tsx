@@ -88,9 +88,10 @@ export default function ProductCard({ product }: { product: Product }) {
                 value={String(selectedQuantity)}
                 onValueChange={(value) => setSelectedQuantity(Number(value))}
                 disabled={!isInStock}
-              >
+              > 
+                 Qty
                 <SelectTrigger className="w-[70px] h-9">
-                  <SelectValue placeholder="Qty" />Qty
+                  <SelectValue placeholder="Qty" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] overflow-y-auto">
                   {quantityOptions.map(qty => (
