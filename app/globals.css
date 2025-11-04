@@ -187,3 +187,62 @@
 }
 
 }
+
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.lightbox-container {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  background: white;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid #333;
+  z-index: 110;
+  transition: background-color 0.2s;
+}
+.lightbox-close:hover {
+  background: #f0f0f0;
+}
+
+.lightbox-image-wrapper {
+  overflow: hidden;
+  max-width: 100%;
+  max-height: calc(90vh - 2rem); /* Account for padding */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: calc(90vh - 4rem); /* Further constraints */
+  cursor: zoom-in;
+  transition: transform 0.3s ease-in-out;
+}
