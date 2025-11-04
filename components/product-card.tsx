@@ -90,7 +90,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 disabled={!isInStock}
               >
                 <SelectTrigger className="w-[70px] h-9">
-                  <SelectValue placeholder="Qty" />
+                  <SelectValue placeholder="Qty" />Qty
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] overflow-y-auto">
                   {quantityOptions.map(qty => (
