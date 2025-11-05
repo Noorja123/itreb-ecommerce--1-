@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
+// 1. We no longer need the Tooltip components, so they are removed.
 
 interface Order {
   id: string;
   order_status: string;
   timestamp: string
   productName: string
-  productCode?: string; // <-- 1. Add productCode to interface
+  productCode?: string;
   fullName: string
   phoneNumber: string
   address: string
@@ -83,7 +84,7 @@ export default function AdminOrdersList() {
       );
       toast({
         title: "Error",
-        description: err.message || "Could not update order status.",
+        description: (err as Error).message || "Could not update order status.",
         variant: "destructive",
       });
     }
@@ -91,6 +92,7 @@ export default function AdminOrdersList() {
 
 
   const exportToExcel = () => {
+    // ... (this function is unchanged)
     if (orders.length === 0) {
       alert("No orders to export")
       return
@@ -100,7 +102,7 @@ export default function AdminOrdersList() {
       "Timestamp",
       "Order Status",
       "Product Name",
-      "Product Code", // <-- 2. Add to Excel export headers
+      "Product Code",
       "Customer Name",
       "Phone Number",
       "Local Board",
@@ -118,7 +120,7 @@ export default function AdminOrdersList() {
           `"${order.timestamp}"`,
           `"${order.order_status}"`,
           `"${order.productName}"`,
-          `"${order.productCode || ''}"`, // <-- 3. Add to Excel export data
+          `"${order.productCode || ''}"`,
           `"${order.fullName}"`,
           `"${order.phoneNumber}"`,
           `"${order.localBoard || ''}"`,
@@ -144,6 +146,7 @@ export default function AdminOrdersList() {
   }
 
   return (
+    // 2. We no longer need TooltipProvider, so it's removed.
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-foreground">Orders</h2>
@@ -164,7 +167,6 @@ export default function AdminOrdersList() {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            {/* FIX: Removed whitespace here */}
             <thead><tr className="border-b border-border">
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Processed</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Timestamp</th>
@@ -180,7 +182,6 @@ export default function AdminOrdersList() {
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Unit Price</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Total Price</th>
             </tr></thead>
-            {/* FIX: Removed whitespace here */}
             <tbody>{orders.map((order, index) => (
                 <tr key={index} className="border-b border-border hover:bg-slate-50">
                   <td className="py-3 px-4 text-foreground">
@@ -199,7 +200,13 @@ export default function AdminOrdersList() {
                   <td className="py-3 px-4 text-foreground">{order.localBoard}</td>
                   <td className="py-3 px-4 text-foreground">{order.regionalBoard}</td>
                   <td className="py-3 px-4 text-foreground">{order.subLocalBoard}</td>
-                  <td className="py-3 px-4 text-foreground">{order.address}</td>
+                  
+                  {/* --- 3. THE FIX for the Address column --- */}
+                  <td className="py-3 px-4 text-foreground whitespace-normal max-w-xs break-words">
+                    {order.address}
+                  </td>
+                  {/* --- END OF FIX --- */}
+
                   <td className="py-3 px-4 text-foreground">{order.quantity || "N/A"}</td>
                   <td className="py-3 px-4 text-foreground">₹{order.price?.toFixed(2) || "0.00"}</td>
                   <td className="py-3 px-4 text-foreground font-semibold">₹{order.totalPrice?.toFixed(2) || "0.00"}</td>
