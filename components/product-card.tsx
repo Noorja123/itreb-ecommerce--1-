@@ -51,7 +51,10 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const isInStock = product.stock_quantity > 0;
-  const quantityOptions = Array.from({ length: Math.min(product.stock_quantity, 10) }, (_, i) => i + 1); // Cap at 10 for UI
+  // --- THIS IS THE FIX ---
+  // Changed Math.min(product.stock_quantity, 10) to just product.stock_quantity
+  const quantityOptions = Array.from({ length: product.stock_quantity }, (_, i) => i + 1); 
+  // --- END OF FIX ---
   const imageUrl = product.image_url || "/placeholder.svg?height=200&width=300&query=product";
 
   return (
