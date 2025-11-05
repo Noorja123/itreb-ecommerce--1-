@@ -4,10 +4,10 @@ import { useEffect, useState } from "react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import ProductCard from "@/components/product-card"
-import { CATEGORIES } from "@/lib/categories" // <-- 1. Import categories
-import { ArrowLeft } from "lucide-react" // <-- 2. Import an icon
+import { CATEGORIES } from "@/lib/categories"
+import { ArrowLeft } from "lucide-react" 
 
-// 3. Define the product interface, including the new category field
+
 interface Product {
   id: string
   name: string
@@ -15,21 +15,18 @@ interface Product {
   description: string
   image_url?: string
   is_deleted?: boolean
-  stock_quantity: number; // <-- Make sure this is here
-  in_stock?: boolean;     // <-- Make sure this is here
-  category?: string;      // <-- The new field
+  stock_quantity: number; 
+  in_stock?: boolean;     
+  category?: string;      
 }
 
-// 4. Create a list of categories including "All Products" for navigation
 const navCategories = ["All Products", ...CATEGORIES]
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
-  // 5. State to track which category is selected. null = show category grid
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-  // 6. Fetch products based on the selected category
   const fetchProducts = async (category: string | null) => {
     if (category === null) {
       setProducts([])
@@ -40,7 +37,6 @@ export default function ProductsPage() {
     setLoading(true)
     try {
       let url = "/api/products"
-      // If category is not "All Products", add it as a query param
       if (category && category !== "All Products") {
         url = `/api/products?category=${encodeURIComponent(category)}`
       }
@@ -56,12 +52,11 @@ export default function ProductsPage() {
     }
   }
 
-  // 7. Re-run the fetch logic whenever the selectedCategory changes
   useEffect(() => {
     fetchProducts(selectedCategory)
   }, [selectedCategory])
 
-  // 8. Helper function to render the product grid
+  
   const renderProductGrid = () => {
     if (loading) {
       return (
@@ -85,14 +80,12 @@ export default function ProductsPage() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
-          // Make sure your ProductCard component accepts this product prop
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
     )
   }
 
-  // 9. Helper function to render the category selection grid
   const renderCategoryGrid = () => (
     <>
       <h1 className="text-4xl font-bold mb-2 text-primary">Our Products</h1>
@@ -118,7 +111,7 @@ export default function ProductsPage() {
         <div className="max-w-7xl mx-auto">
           {/* 10. Conditional Rendering Logic */}
           {selectedCategory ? (
-            // We have a category selected, show the product list
+      
             <div>
               <button
                 onClick={() => setSelectedCategory(null)}
