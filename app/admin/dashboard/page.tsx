@@ -17,6 +17,7 @@ interface Product {
   image_url?: string;
   stock_quantity: number;
   is_deleted: boolean;
+  category?: string; // <-- ADDED
 }
 
 export default function AdminDashboard() {

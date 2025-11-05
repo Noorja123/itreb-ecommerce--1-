@@ -7,7 +7,23 @@ export async function POST(request: Request) {
     const price = formData.get("price") as string
     const description = formData.get("description") as string
     const stock_quantity = formData.get("stock_quantity") as string
+    const category = formData.get("category") as string
     const file = formData.get("file") as File | null
+
+    // --- 1. SERVER-SIDE VALIDATION ---
+    // This checks if any of the required fields are empty.
+    if (!name || !price || !description || !stock_quantity || !category) {
+      return Response.json({ message: "Missing required fields. Please fill out the entire form." }, { status: 400 })
+    }
+
+    // --- 2. VALIDATE NUMBERS ---
+    const parsedPrice = Number.parseFloat(price)
+    const parsedStock = Number.parseInt(stock_quantity)
+
+    if (isNaN(parsedPrice) || isNaN(parsedStock)) {
+      return Response.json({ message: "Price and Quantity must be valid numbers." }, { status: 400 })
+    }
+    // --- END OF VALIDATION BLOCK ---
 
     let imageUrl = ""
 
@@ -15,8 +31,6 @@ export async function POST(request: Request) {
       const adminClient = getAdminClient()
       const fileName = `${Date.now()}-${file.name}`
       const fileBuffer = await file.arrayBuffer()
-
-      console.log("[v0] Uploading file to storage:", fileName)
 
       const { data: uploadData, error: uploadError } = await adminClient.storage
         .from("product-images")
@@ -31,11 +45,8 @@ export async function POST(request: Request) {
         return Response.json({ message: `Failed to upload image: ${uploadError.message}` }, { status: 500 })
       }
 
-      console.log("[v0] Upload successful:", uploadData)
-
       const { data: publicUrlData } = adminClient.storage.from("product-images").getPublicUrl(fileName)
       imageUrl = publicUrlData.publicUrl
-      console.log("[v0] Public URL:", imageUrl)
     }
 
     const adminClient = getAdminClient()
@@ -44,23 +55,24 @@ export async function POST(request: Request) {
       .insert([
         {
           name,
-          price: Number.parseFloat(price),
+          price: parsedPrice, // Use validated number
           description,
           image_url: imageUrl || null,
-          stock_quantity: Number.parseInt(stock_quantity),
-          in_stock: Number.parseInt(stock_quantity) > 0,
+          stock_quantity: parsedStock, // Use validated number
+          in_stock: parsedStock > 0,   
+          category: category,
         },
       ])
       .select()
 
     if (error) {
-      console.error("Supabase error:", error)
-      return Response.json({ message: "Failed to add product" }, { status: 500 })
+      console.error("Supabase error:", error.message)
+      return Response.json({ message: `Database error: ${error.message}` }, { status: 500 })
     }
 
     return Response.json(data?.[0], { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error adding product:", error)
-    return Response.json({ message: "Failed to add product" }, { status: 500 })
+    return Response.json({ message: `Server error: ${error.message || 'Unknown error'}` }, { status: 500 })
   }
 }

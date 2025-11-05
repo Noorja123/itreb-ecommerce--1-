@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import ImageLightbox from "./ImageLightbox" // <-- 1. Import the new component
+import ImageLightbox from "./ImageLightbox" 
 
 interface Product {
   id: string
@@ -21,16 +21,16 @@ interface Product {
   image_url?: string
   stock_quantity: number
   in_stock?: boolean
+  category?: string; // <-- 1. Add category to interface
 }
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart, cart } = useCart();
   const { toast } = useToast()
   const [selectedQuantity, setSelectedQuantity] = useState(1);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false); // <-- 2. Add state for lightbox
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false); 
 
   const handleAddToCart = () => {
-    // ... (rest of the function is unchanged)
     const existingCartItem = cart.find((item) => item.id === product.id);
     const currentQuantityInCart = existingCartItem ? existingCartItem.quantity : 0;
 
@@ -51,13 +51,12 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   const isInStock = product.stock_quantity > 0;
-  const quantityOptions = Array.from({ length: product.stock_quantity }, (_, i) => i + 1);
+  const quantityOptions = Array.from({ length: Math.min(product.stock_quantity, 10) }, (_, i) => i + 1); // Cap at 10 for UI
   const imageUrl = product.image_url || "/placeholder.svg?height=200&width=300&query=product";
 
   return (
-    <> {/* <-- 3. Wrap in a fragment */}
+    <> 
       <div className="product-card-hover bg-white rounded-lg shadow-md overflow-hidden border border-border hover:shadow-xl flex flex-col">
-        {/* 4. Make the image area a button */}
         <button
           type="button"
           onClick={() => setIsLightboxOpen(true)}
@@ -71,7 +70,14 @@ export default function ProductCard({ product }: { product: Product }) {
         </button>
 
         <div className="p-4 flex flex-col flex-1">
-          {/* ... (rest of the card content is unchanged) ... */}
+          {/* --- 2. ADDED CATEGORY BADGE --- */}
+          {product.category && (
+            <Badge variant="secondary" className="bg-primary/10 text-primary self-start mb-2 font-medium text-xs">
+              {product.category}
+            </Badge>
+          )}
+          {/* --- END OF ADDED BLOCK --- */}
+
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-lg font-semibold text-foreground flex-1 pr-2">{product.name}</h3>
             <Badge variant={isInStock ? "secondary" : "destructive"} className={isInStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
@@ -87,16 +93,20 @@ export default function ProductCard({ product }: { product: Product }) {
               <Select
                 value={String(selectedQuantity)}
                 onValueChange={(value) => setSelectedQuantity(Number(value))}
-                disabled={!isInStock}
+                disabled={!isInStock || quantityOptions.length === 0}
               > 
                  Qty
                 <SelectTrigger className="w-[70px] h-9">
                   <SelectValue placeholder="Qty" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] overflow-y-auto">
-                  {quantityOptions.map(qty => (
-                    <SelectItem key={qty} value={String(qty)}>{qty}</SelectItem>
-                  ))}
+                  {quantityOptions.length > 0 ? (
+                    quantityOptions.map(qty => (
+                      <SelectItem key={qty} value={String(qty)}>{qty}</SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="0" disabled>0</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               <button
@@ -111,7 +121,6 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* 5. Conditionally render the lightbox */}
       {isLightboxOpen && (
         <ImageLightbox
           src={imageUrl}

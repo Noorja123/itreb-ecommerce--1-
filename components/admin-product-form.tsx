@@ -1,14 +1,15 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect } from "react"
+import { CATEGORIES } from "@/lib/categories" 
 
 interface FormData {
   name: string
   price: string
   description: string
   stock_quantity: string
+  category: string 
 }
 
 export default function AdminProductForm({
@@ -21,6 +22,7 @@ export default function AdminProductForm({
     price: "",
     description: "",
     stock_quantity: "",
+    category: "", 
   })
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string>("")
@@ -44,7 +46,11 @@ export default function AdminProductForm({
     initializeBucket()
   }, [])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement 
+    >
+  ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
@@ -72,6 +78,7 @@ export default function AdminProductForm({
       formDataToSend.append("price", formData.price)
       formDataToSend.append("description", formData.description)
       formDataToSend.append("stock_quantity", formData.stock_quantity)
+      formDataToSend.append("category", formData.category) 
       if (file) {
         formDataToSend.append("file", file)
       }
@@ -83,14 +90,32 @@ export default function AdminProductForm({
 
       if (response.ok) {
         setMessage("Product added successfully!")
-        setFormData({ name: "", price: "", description: "", stock_quantity: "" })
+        setFormData({ name: "", price: "", description: "", stock_quantity: "", category: "" })
         setFile(null)
         setPreview("")
         if (fileInputRef.current) fileInputRef.current.value = ""
         onProductAdded()
       } else {
-        const errorData = await response.json()
-        setMessage(`Failed to add product: ${errorData.message}`)
+        
+        // --- THIS IS THE FIX ---
+        // We wrap the .json() call in a try...catch block.
+        // This prevents the "Unexpected end of JSON input" error
+        // if the server sends an error with an empty body.
+        
+        let errorMessage = "Failed to add product. Please try again."
+        try {
+          const errorData = await response.json() // This is the line that can fail
+          if (errorData && errorData.message) {
+            errorMessage = `Failed to add product: ${errorData.message}`
+          }
+        } catch (jsonError) {
+          // The error response was empty or not JSON.
+          // We'll just use the default error message.
+          console.error("Could not parse error response:", jsonError)
+        }
+        setMessage(errorMessage)
+        // --- END OF FIX ---
+
       }
     } catch (error) {
       setMessage("An error occurred")
@@ -153,6 +178,24 @@ export default function AdminProductForm({
         </div>
 
         <div>
+          <label className="block text-sm font-medium text-foreground mb-2">Category</label>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+            required
+          >
+            <option value="" disabled>Select a category</option>
+            {CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium text-foreground mb-2">Quantity</label>
           <input
             type="number"
@@ -170,7 +213,7 @@ export default function AdminProductForm({
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            onChange={handleFileChange}
+            onChange={handleFileChange} 
             className="w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
           />
           {preview && (

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge"; // <-- 1. Import Badge
 
 interface Product {
   id: string;
@@ -12,6 +13,7 @@ interface Product {
   image_url?: string;
   stock_quantity: number;
   is_deleted: boolean;
+  category?: string; // <-- 2. Add category to interface
 }
 
 export default function AdminProductList({
@@ -120,7 +122,16 @@ export default function AdminProductList({
               className="flex justify-between items-start p-4 border border-border rounded-md hover:bg-neutral-light transition-colors"
             >
               <div className="flex-1">
-                <h3 className="font-semibold text-foreground">{product.name}</h3>
+                {/* --- 3. MODIFIED BLOCK to show category --- */}
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-foreground">{product.name}</h3>
+                  {product.category && (
+                    <Badge variant="outline" className="font-normal text-xs">
+                      {product.category}
+                    </Badge>
+                  )}
+                </div>
+                {/* --- END OF MODIFIED BLOCK --- */}
                 <p className="">{product.description}</p>
                 <div className="flex items-center gap-2 mt-2">
                   {editingId === product.id ? (

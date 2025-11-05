@@ -164,12 +164,12 @@ export default function AdminOrdersList() {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
+            {/* FIX: Removed whitespace here */}
+            <thead><tr className="border-b border-border">
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Processed</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Timestamp</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
-                <th className="text-left py-3 px-4 font-semibold text-foreground">Product Code</th> {/* <-- 4. Add table header */}
+                <th className="text-left py-3 px-4 font-semibold text-foreground">Product Code</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Name</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Phone</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Local Board</th>
@@ -179,10 +179,9 @@ export default function AdminOrdersList() {
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Quantity</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Unit Price</th>
                 <th className="text-left py-3 px-4 font-semibold text-foreground">Total Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order, index) => (
+            </tr></thead>
+            {/* FIX: Removed whitespace here */}
+            <tbody>{orders.map((order, index) => (
                 <tr key={index} className="border-b border-border hover:bg-slate-50">
                   <td className="py-3 px-4 text-foreground">
                     <Switch
@@ -194,7 +193,7 @@ export default function AdminOrdersList() {
                   </td>
                   <td className="py-3 px-4 text-foreground">{order.timestamp}</td>
                   <td className="py-3 px-4 text-foreground">{order.productName}</td>
-                  <td className="py-3 px-4 text-foreground">{order.productCode || "N/A"}</td> {/* <-- 5. Add table cell */}
+                  <td className="py-3 px-4 text-foreground">{order.productCode || "N/A"}</td>
                   <td className="py-3 px-4 text-foreground">{order.fullName}</td>
                   <td className="py-3 px-4 text-foreground">{order.phoneNumber}</td>
                   <td className="py-3 px-4 text-foreground">{order.localBoard}</td>
@@ -205,8 +204,7 @@ export default function AdminOrdersList() {
                   <td className="py-3 px-4 text-foreground">₹{order.price?.toFixed(2) || "0.00"}</td>
                   <td className="py-3 px-4 text-foreground font-semibold">₹{order.totalPrice?.toFixed(2) || "0.00"}</td>
                 </tr>
-              ))}
-            </tbody>
+            ))}</tbody>
           </table>
         </div>
       )}

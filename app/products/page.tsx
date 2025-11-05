@@ -4,7 +4,10 @@ import { useEffect, useState } from "react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import ProductCard from "@/components/product-card"
+import { CATEGORIES } from "@/lib/categories" // <-- 1. Import categories
+import { ArrowLeft } from "lucide-react" // <-- 2. Import an icon
 
+// 3. Define the product interface, including the new category field
 interface Product {
   id: string
   name: string
@@ -12,21 +15,37 @@ interface Product {
   description: string
   image_url?: string
   is_deleted?: boolean
+  stock_quantity: number; // <-- Make sure this is here
+  in_stock?: boolean;     // <-- Make sure this is here
+  category?: string;      // <-- The new field
 }
+
+// 4. Create a list of categories including "All Products" for navigation
+const navCategories = ["All Products", ...CATEGORIES]
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  // 5. State to track which category is selected. null = show category grid
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchProducts()
-    const interval = setInterval(fetchProducts, 5000)
-    return () => clearInterval(interval)
-  }, [])
+  // 6. Fetch products based on the selected category
+  const fetchProducts = async (category: string | null) => {
+    if (category === null) {
+      setProducts([])
+      setLoading(false)
+      return
+    }
 
-  const fetchProducts = async () => {
+    setLoading(true)
     try {
-      const response = await fetch("/api/products")
+      let url = "/api/products"
+      // If category is not "All Products", add it as a query param
+      if (category && category !== "All Products") {
+        url = `/api/products?category=${encodeURIComponent(category)}`
+      }
+      
+      const response = await fetch(url)
       const data = await response.json()
       const activeProducts = data.filter((p: Product) => !p.is_deleted)
       setProducts(activeProducts)
@@ -37,31 +56,85 @@ export default function ProductsPage() {
     }
   }
 
+  // 7. Re-run the fetch logic whenever the selectedCategory changes
+  useEffect(() => {
+    fetchProducts(selectedCategory)
+  }, [selectedCategory])
+
+  // 8. Helper function to render the product grid
+  const renderProductGrid = () => {
+    if (loading) {
+      return (
+        <div className="text-center py-12">
+          <div className="inline-block">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+          <p className="text-muted mt-4">Loading products...</p>
+        </div>
+      )
+    }
+
+    if (products.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-muted text-lg">No products available in this category.</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          // Make sure your ProductCard component accepts this product prop
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    )
+  }
+
+  // 9. Helper function to render the category selection grid
+  const renderCategoryGrid = () => (
+    <>
+      <h1 className="text-4xl font-bold mb-2 text-primary">Our Products</h1>
+      <p className="text-muted mb-8">Browse our collection by category</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {navCategories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className="product-card-hover bg-white rounded-lg shadow-md overflow-hidden border border-border hover:shadow-xl flex flex-col items-center justify-center p-8 min-h-[150px] text-center"
+          >
+            <h2 className="text-2xl font-semibold text-foreground">{category}</h2>
+          </button>
+        ))}
+      </div>
+    </>
+  )
+
   return (
     <main className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <div className="flex-1 bg-neutral-light py-12 px-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2 text-primary">Our Products</h1>
-          <p className="text-muted mb-8">Browse our collection and place your order</p>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-              <p className="text-muted mt-4">Loading products...</p>
-            </div>
-          ) : products.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted text-lg">No products available yet.</p>
+          {/* 10. Conditional Rendering Logic */}
+          {selectedCategory ? (
+            // We have a category selected, show the product list
+            <div>
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className="btn-outline text-sm mb-6 flex items-center gap-2"
+              >
+                <ArrowLeft size={16} />
+                Back to Categories
+              </button>
+              <h1 className="text-3xl font-bold mb-8 text-primary">
+                {selectedCategory}
+              </h1>
+              {renderProductGrid()}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            // No category selected, show the category grid
+            renderCategoryGrid()
           )}
         </div>
       </div>
