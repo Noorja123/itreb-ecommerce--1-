@@ -1,31 +1,14 @@
-// app/api/products/route.ts
-import { createClient } from "@supabase/supabase-js";
-import { NextRequest } from "next/server";
+import { getAdminClient } from "@/lib/supabase/admin";
+import { NextRequest, NextResponse } from "next/server";
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY; // or SUPABASE_ANON_KEY if you prefer anon
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  // Do NOT log secrets; only log existence for debugging
-  console.error("Missing Supabase server env vars (SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY)");
-}
-
-function makeSupabaseClient() {
-  return createClient(SUPABASE_URL ?? "", SUPABASE_SERVICE_ROLE_KEY ?? "", {
-    // ensure the client doesn't try to use browser features
-    global: {
-      fetch: globalThis.fetch as any,
-    },
-  });
-}
-
+// Handle GET requests (Fetch products)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = makeSupabaseClient();
+    const supabase = getAdminClient();
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
-    const search = searchParams.get("search"); // example if you support search
+    const search = searchParams.get("search");
     const limit = Number(searchParams.get("limit") ?? 0);
 
     // Build base query
@@ -34,31 +17,105 @@ export async function GET(request: NextRequest) {
       .select("*")
       .order("created_at", { ascending: false });
 
-    // optional filters (example)
+    // Apply filters
     if (category) query = query.eq("category", category);
-    if (search) query = query.ilike("title", `%${search}%`);
+    if (search) query = query.ilike("name", `%${search}%`); // Changed 'title' to 'name' to match your schema
     if (limit > 0) query = query.limit(limit);
 
-    // execute
+    // Execute query
     const { data, error } = await query;
 
     if (error) {
       console.error("Supabase error (server):", error);
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return new Response(JSON.stringify(data ?? []), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return NextResponse.json(data || []);
   } catch (err) {
-    console.error("Unexpected error in /api/products:", err);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.error("Unexpected error in /api/admin/products:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+// Handle POST requests (Create new product)
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = getAdminClient();
+    const formData = await request.formData();
+
+    // Extract fields from FormData
+    const name = formData.get("name") as string;
+    const price = parseFloat(formData.get("price") as string);
+    const description = formData.get("description") as string;
+    const stock_quantity = parseInt(formData.get("stock_quantity") as string);
+    const category = formData.get("category") as string;
+    const file = formData.get("file") as File | null;
+
+    if (!name || !price || !description || isNaN(stock_quantity)) {
+      return NextResponse.json(
+        { message: "Missing required fields (name, price, description, stock)" },
+        { status: 400 }
+      );
+    }
+
+    let image_url = null;
+
+    // Handle Image Upload if file exists
+    if (file) {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        return NextResponse.json(
+          { message: "Failed to upload image: " + uploadError.message },
+          { status: 500 }
+        );
+      }
+
+      // Get Public URL
+      const { data: publicUrlData } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(fileName);
+
+      image_url = publicUrlData.publicUrl;
+    }
+
+    // Insert into Database
+    const { data, error: insertError } = await supabase
+      .from("products")
+      .insert({
+        name,
+        price,
+        description,
+        stock_quantity,
+        category,
+        image_url,
+        in_stock: stock_quantity > 0,
+        is_deleted: false,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error("Database insert error:", insertError);
+      return NextResponse.json(
+        { message: "Failed to save product: " + insertError.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(data, { status: 201 });
+
+  } catch (error: any) {
+    console.error("POST Handler Error:", error);
+    return NextResponse.json(
+      { message: "Internal server error: " + (error.message || "Unknown") },
+      { status: 500 }
+    );
   }
 }
