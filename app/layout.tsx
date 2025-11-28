@@ -9,7 +9,7 @@ const geistSans = Geist({ subsets: ["latin"] })
 const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "ITREB India - E-Commerce",
+  title: "Platinum Jubliee Publications",
   description: "ITREB India Product Catalog",
     generator: 'v0.app'
 }

@@ -18,7 +18,7 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity">
               <Image src="/logo.png" alt="ITREB India Logo" width={40} height={40} className="w-10 h-10" />
-              <span className="text-primary">ITREB India</span>
+              <span className="text-primary">Platinum Jubliee Publications</span>
             </Link>
 
             <div className="hidden md:flex items-center gap-8">

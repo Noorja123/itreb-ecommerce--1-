@@ -14,7 +14,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-white/10"></div>
 
       <div className="max-w-7xl mx-auto text-center relative z-10">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-balance text-black">Welcome to ITREB India</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-balance text-black">Welcome to Platinum Jubilee Publications</h1>
         <p className="text-lg md:text-xl mb-8 text-balance opacity-95 text-black">
           Discover our premium products and services
         </p>
